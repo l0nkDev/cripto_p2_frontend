@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">cripto-p2-frontend</string>
+    <string name="title_activity_main">cripto-p2-frontend</string>
+    <string name="package_name">com.cripto.p2</string>
+    <string name="custom_url_scheme">com.cripto.p2</string>
+</resources>
