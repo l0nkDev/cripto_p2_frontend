@@ -1,0 +1,7 @@
+{
+  "name": "cripto_p2_frontend",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

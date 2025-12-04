@@ -1,0 +1,99 @@
+<div style="height: 100%; width: 100%;">
+  <div class="card" style="margin: 5%;">
+    <h5 class="card-header" style=" display: flex; justify-content: space-between; align-items: center;">
+      <a>Wallets</a>
+      <button class="btn btn-outline-success" (click)="creatingWallet = true">➕</button>
+    </h5>
+    <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem; padding: 2rem;">
+    @for (wallet of wallets; track $index) {
+      <div class="card">
+        <h6 class="card-header">{{wallet.name}}</h6>
+        <div class="card-body">
+          <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <h3 [style.color]="getAmount(wallet) > 0 ? 'green' : getAmount(wallet) < 0 ? 'red' : 'black'">{{getAmount(wallet) < 0 ? '-$' : '$'}}{{abs(getAmount(wallet))}}</h3>
+            <button class="btn btn-primary" (click)="wallet.creatingTransaction = true">Enviar</button>
+          </div>
+          @if (wallet.transactions.length > 0) {
+              <div class="card" style="margin-top: 1rem;">
+                <div class="card-header">Transacciones</div>
+                <div class="card-body" style="padding: 0;">
+                  <ul class="list-group list-group-flush">
+                    @for (transaction of wallet.transactions; track $index) {
+                      <li class="list-group-item" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                        <div>
+                          <b>{{transaction.transaction.senderName}}</b> envió <b>${{transaction.transaction.amount}}</b>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem">
+                          <button class="btn btn-primary" (click)="transaction.alteringTransaction = true">Alterar</button>
+                          <button class="btn btn-success" (click)="verifyTransaction(transaction)">Verificar</button>
+                        </div>
+                      </li>
+                      @if (transaction.alteringTransaction) {
+                        <div style="position: fixed; top: 0; left: 0; z-index:9999 ;height: 100vh; width: 100vw; background-color: rgba(0, 0, 0, 0.5);">
+                          <div class="card" style="margin: 20%;">
+                            <div class="card-header" style=" display: flex; justify-content: space-between;">
+                              <a>Alterar transacción</a><a (click)="transaction.alteringTransaction = processing || false">X</a>
+                            </div>
+                            <div class="card-body" style="display: flex; flex-direction: column; align-items: end;">
+                              <div class="input-group mb-3">
+                                <span class="input-group-text" id="basic-addon1">Monto</span>
+                                <input type="number" class="form-control" [value]="transaction.transaction.amount" #amount>
+                              </div>
+
+                                <button class="btn btn-success" (click)="alterTransaction(transaction, amount.valueAsNumber); processing = true;">{{processing ? 'Alterando' : 'Alterar'}}</button>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    }
+                  </ul>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      @if (wallet.creatingTransaction) {
+        <div style="position: fixed; top: 0px; left: 0px; z-index:9999 ;height: 100vh; width: 100vw; background-color: rgba(0, 0, 0, 0.5);">
+          <div class="card" style="margin: 20%;">
+            <div class="card-header" style="display: flex; justify-content: space-between;">
+              <a>Realizando transacción</a><a (click)="wallet.creatingTransaction= processing || false">X</a>
+            </div>
+            <div class="card-body" style="display: flex; align-items: end; flex-direction: column;">
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Destinatario</span>
+                <select class="form-select" aria-label="Default select example" #receiver>
+                  @for (_wallet of wallets; track $index) {
+                    @if (_wallet != wallet) {
+                      <option [value]="_wallet.name" [selected]="$index === 1">{{_wallet.name}}</option>
+                    }
+                  }
+                </select>
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Monto</span>
+                <input type="number" class="form-control" value="0" #amount>
+              </div>
+              <button class="btn btn-success" (click)="doTransaction(wallet.name, receiver.value, amount.valueAsNumber); processing = true;">{{processing ? 'Enviando' : 'Enviar'}}</button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+  @if (creatingWallet) {
+    <div style="position: fixed; top: 0px; left: 0px; z-index:9999 ;height: 100vh; width: 100vw; background-color: rgba(0, 0, 0, 0.5);">
+      <div class="card" style="margin: 20%;">
+        <div class="card-header" style=" display: flex; justify-content: space-between;">
+          <a>Crear wallet</a><a (click)="creatingWallet = processing || false">X</a>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; align-items: end;">
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">Nombre</span>
+            <input type="text" class="form-control" value="Nueva wallet" #nombre>
+          </div>
+          <button class="btn btn-success" (click)="createWallet(nombre.value); processing = true;">{{processing ? 'Creando' : 'Crear'}}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
