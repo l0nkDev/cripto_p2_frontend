@@ -1,4 +1,86 @@
-<div>
-{{getBalance()}}$
-<button (click)="generateKeysManual()">Calcular</button>
+<div style="height: 100%; width: 100%;">
+  <div class="card" style="margin: 5%;">
+    <h5 class="card-header">Generar llaves RSA</h5>
+    <div class="card-body" style="display: flex; flex-direction: column; padding: 2rem; padding-bottom: 1rem;">
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">p</span>
+        <input class="form-control"  [(ngModel)]="p">
+        <span class="input-group-text" id="basic-addon1">q</span>
+        <input class="form-control"  [(ngModel)]="q">
+        <Button class="btn btn-primary" (click)="onGeneratePrimesClick()">Generar</Button>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">n</span>
+        <input class="form-control" type="number" [(ngModel)]="n">
+        <button class="btn btn-primary" (click)="n = p*q;">Calcular</button>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">r</span>
+        <input class="form-control" type="number" [(ngModel)]="r">
+        <button class="btn btn-primary" (click)="onCalculateRClick()">Calcular</button>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">e</span>
+        <input class="form-control" type="number" [(ngModel)]="e">
+        <Button class="btn btn-primary" (click)="onGenerateEClick()"> Generar</Button>
+        <Button class="btn btn-primary" (click)="onStandardEClick()"> Default</Button>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">d</span>
+        <input class="form-control" type="number" [(ngModel)]="d">
+        <Button class="btn btn-primary" (click)="onCalculateDClick()">Calcular</Button>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Llave pública</span>
+        <div class="form-control">{{"(" + n + ", " + e + ")"}}</div>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Llave privada</span>
+        <div class="form-control">{{"(" + n + ", " + d + ")"}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-left: 5%; margin-right: 5%; margin-bottom: 5%; ">
+    <h5 class="card-header">Firma</h5>
+    <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem; padding: 2rem; padding-bottom: 1rem;">
+      <div>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">Datos</span>
+          <input class="form-control" [(ngModel)]="datos">
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">Hash</span>
+          <input class="form-control" [(ngModel)]="hash">
+          <button class="btn btn-primary" (click)="onHashClick()">Calcular</button>
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">Firma</span>
+          <input class="form-control" [(ngModel)]="signature">
+          <button class="btn btn-primary" (click)="onSignClick()">Firmar</button>
+        </div>
+      </div>
+    </div>
+    <h5 class="card-header">Verificación</h5>
+    <div class="card-body" style="display: flex; flex-direction: column; padding: 2rem; padding-bottom: 1rem;">
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Datos</span>
+        <input class="form-control" [(ngModel)]="datos_2">
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Hash</span>
+        <input class="form-control" [(ngModel)]="hash_2">
+        <button class="btn btn-primary" (click)="onHash2Click()">Calcular</button>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Firma</span>
+        <input class="form-control" [(ngModel)]="signature_2">
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Firma desencriptada</span>
+        <input class="form-control" [(ngModel)]="decrypted_signature">
+        <button class="btn btn-primary" (click)="onSignDecrypt2Click()">Desencriptar</button>
+      </div>
+      <button class="btn btn-primary" (click)="onVerifyClick()">Verificar</button>
+    </div>
+  </div>
 </div>

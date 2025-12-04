@@ -35,6 +35,11 @@ export class Home implements OnInit {
     EdgeToEdge.enable();
   }
 
+  async onVerifyButton(signedTransaction: SignedTransaction): Promise<void> {
+    const isVerified = await this.verifyTransaction(signedTransaction)
+    alert(isVerified ? 'La transacción es correcta' : 'La transacción fue alterada');
+  }
+
   getWallet(name: string): Wallet | undefined {
     let selWallet: Wallet | undefined = undefined;
     this.wallets.forEach((wallet) => {
@@ -54,7 +59,7 @@ export class Home implements OnInit {
   }
 
   async createWallet(name: string): Promise<void> {
-    const keypair: CryptoKeyPair | undefined = await this.generateKeys();
+    const keypair: CryptoKeyPair | undefined = await this.generateKeys(2048);
     if (keypair) {
       this.wallets.push({
         name: name,
@@ -79,15 +84,7 @@ export class Home implements OnInit {
     const stringTransaction = JSON.stringify(transaction);
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(stringTransaction);
-    const signature: ArrayBuffer = await crypto.subtle.sign(
-      {
-        name: 'RSA-PSS',
-        hash: 'SHA-256',
-        saltLength: 32,
-      },
-      sender.keys.privateKey,
-      dataBuffer
-    );
+    const signature: ArrayBuffer = await this.sign(dataBuffer, sender.keys.privateKey)
     receiver.transactions.push({ signature, transaction, alteringTransaction: false });
     sender.amountSent += amount;
     sender.creatingTransaction = false;
@@ -98,16 +95,7 @@ export class Home implements OnInit {
     const stringTransaction = JSON.stringify(signedTransaction.transaction);
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(stringTransaction);
-    const isVerified = await crypto.subtle.verify(
-      {
-        name: 'RSA-PSS',
-        hash: 'SHA-256',
-        saltLength: 32,
-      },
-      signedTransaction.transaction.senderPublicKey,
-      signedTransaction.signature,
-      dataBuffer
-    );
+    const isVerified = await this.verify(dataBuffer, signedTransaction.signature, signedTransaction.transaction.senderPublicKey)
     alert(isVerified ? 'La transacción es correcta' : 'La transacción fue alterada');
     return isVerified;
   }
@@ -118,12 +106,12 @@ export class Home implements OnInit {
     transaction.alteringTransaction = false;
   }
 
-  async generateKeys(): Promise<CryptoKeyPair | undefined> {
+  async generateKeys(modulusLength: number): Promise<CryptoKeyPair | undefined> {
     try {
       const keyPair = await window.crypto.subtle.generateKey(
         {
           name: 'RSA-PSS',
-          modulusLength: 2048,
+          modulusLength,
           publicExponent: new Uint8Array([1, 0, 1]),
           hash: 'SHA-256',
         },
@@ -135,6 +123,33 @@ export class Home implements OnInit {
       console.error(e);
       return undefined;
     }
+  }
+
+  async sign(input: Uint8Array<ArrayBuffer>, privateKey: CryptoKey): Promise<ArrayBuffer> {
+    const signature: ArrayBuffer = await crypto.subtle.sign(
+      {
+        name: 'RSA-PSS',
+        hash: 'SHA-256',
+        saltLength: 32,
+      },
+      privateKey,
+      input
+    );
+    return signature;
+  }
+
+  async verify(input: Uint8Array<ArrayBuffer>, signature: ArrayBuffer, publicKey: CryptoKey): Promise<boolean> {
+    const isVerified = await crypto.subtle.verify(
+      {
+        name: 'RSA-PSS',
+        hash: 'SHA-256',
+        saltLength: 32,
+      },
+      publicKey,
+      signature,
+      input
+    );
+    return isVerified
   }
 
   abs(num: number): number {
